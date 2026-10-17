@@ -26,6 +26,12 @@ model-viewer{width:100%;height:62vh;min-height:360px;background:radial-gradient(
 .bilgi div{background:#121c30;border-radius:10px;padding:10px 6px;text-align:center}
 .bilgi b{display:block;color:var(--altin);font-size:17px}
 .bilgi small{color:var(--soluk);font-size:11px}
+.secim{margin:10px 16px 0;display:flex;flex-direction:column;gap:8px}
+.grup{display:flex;background:#121c30;border-radius:12px;padding:4px;gap:4px}
+.grup button{flex:1;border:0;background:transparent;color:var(--soluk);font:inherit;font-size:13.5px;padding:10px 6px;border-radius:9px;font-weight:600}
+.grup button.aktif{background:var(--altin);color:#0b1220}
+.grup-ad{font-size:11px;color:var(--soluk);letter-spacing:.6px;margin:2px 4px -4px}
+#ipucu{margin:8px 16px 0;font-size:12.5px;color:var(--soluk);line-height:1.4}
 #yok{display:none;margin:0 16px 14px;background:#2a1b14;border-left:3px solid var(--altin);padding:10px 12px;font-size:13px;border-radius:6px}
 footer{text-align:center;color:#5b647a;font-size:11px;padding:6px 0 20px}
 </style></head><body>
@@ -42,11 +48,18 @@ footer{text-align:center;color:#5b647a;font-size:11px;padding:6px 0 20px}
     Kamerada gör (AR)
   </button>
 </model-viewer>
+<div class="secim">
+  <div class="grup-ad">NE GÖSTERİLSİN</div>
+  <div class="grup" id="g-mod"><button data-v="tam" class="aktif">Tüm vitrin</button><button data-v="isik">Sadece ışıklar</button></div>
+  <div class="grup-ad">NEREYE KONSUN</div>
+  <div class="grup" id="g-yer"><button data-v="floor" class="aktif">Yere</button><button data-v="wall">Duvara</button></div>
+</div>
+<p id="ipucu"></p>
 <div id="yok">Bu telefonda AR açılamadı. Modeli yukarıda parmağınla çevirip yakınlaştırabilirsin. AR için güncel Chrome ve “Google Play Services for AR” gerekir.</div>
 
 <ul class="adimlar">
   <li>“Kamerada gör”e bas, kamera iznini ver.</li>
-  <li>Telefonu yere doğrult ve yavaşça sağa sola gezdir; zemin tanınınca vitrin yere oturur.</li>
+  <li>Telefonu yere (ya da “Duvara” seçtiysen duvara) doğrult ve yavaşça sağa sola gezdir; yüzey tanınınca vitrin oturur.</li>
   <li>Vitrin 1:1 ölçüdedir, büyüyüp küçülmez. Parmakla kaydırıp döndürerek dükkânın önüne hizala.</li>
   <li>Yürüyerek yaklaş: tavandaki ETNA'ları, bilezikleri, yüzük tepsilerini yakından gör.</li>
 </ul>
@@ -58,6 +71,13 @@ footer{text-align:center;color:#5b647a;font-size:11px;padding:6px 0 20px}
 <footer>GMC LED · Kuyumcu Aydınlatma · AR önizleme ölçü ve yerleşimi gösterir; ışık etkisi için sunumdaki renderlara bakınız.</footer>
 <script>
 const mv=document.getElementById('mv');
+const IPUCU={tam:'Boş dükkân ya da boş alan için: vitrinin tamamı 1:1 yerleşir.',
+  isik:'Dolu dükkân için: sadece 18 ETNA 26 gerçek yüksekliğinde (218 cm) görünür. Yerdeki altın L işaretini gerçek vitrinin sol-ön köşesine oturt; silik çerçeve vitrin hacmini gösterir.'};
+const DOSYA={tam:'nur_vitrin.glb',isik:'nur_isik.glb'};
+function sec(g,fn){document.querySelectorAll('#'+g+' button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#'+g+' button').forEach(x=>x.classList.toggle('aktif',x===b));fn(b.dataset.v);});}
+function mod(v){mv.src=DOSYA[v];document.getElementById('ipucu').textContent=IPUCU[v];const y=document.getElementById('yuk');if(y){y.style.display='block';}}
+sec('g-mod',mod);sec('g-yer',v=>{mv.arPlacement=v;});
+document.getElementById('ipucu').textContent=IPUCU.tam;
 mv.addEventListener('progress',e=>{const y=document.getElementById('yuk');if(y)y.textContent='Model yükleniyor… %'+Math.round(e.detail.totalProgress*100);if(e.detail.totalProgress>=1&&y)y.style.display='none';});
 mv.addEventListener('load',()=>{if(!mv.canActivateAR)document.getElementById('yok').style.display='block';});
 mv.addEventListener('ar-status',e=>{if(e.detail.status==='failed')document.getElementById('yok').style.display='block';});
