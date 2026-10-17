@@ -3,6 +3,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Vitrini Yerinde Gör · GMC LED</title>
 <meta name="theme-color" content="#0b1220">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}</script>
 <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
 <style>
 :root{--zemin:#0b1220;--kart:#121c30;--altin:#e8c46a;--yazi:#f4efe2;--soluk:#9aa3b5}
@@ -55,6 +56,13 @@ model-viewer[ar-status="session-started"] .alt-kontrol{bottom:22px}
 .adimlar{margin:16px 16px 8px;padding:0;list-style:none;counter-reset:a}
 .adimlar li{counter-increment:a;display:flex;gap:12px;align-items:flex-start;margin:0 0 10px;font-size:13.5px;line-height:1.4}
 .adimlar li::before{content:counter(a);flex:0 0 24px;height:24px;border-radius:50%;background:#18233b;color:var(--altin);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px}
+#xr-ui{display:none;position:fixed;inset:0;flex-direction:column;justify-content:space-between;pointer-events:none;font-family:"Segoe UI",Roboto,Arial,sans-serif;color:var(--yazi)}
+#xr-ui .xr-kontrol{pointer-events:auto}
+#xr-ui .xr-ust{display:flex;gap:8px;justify-content:space-between;padding:12px 10px 0;align-items:flex-start}
+#xr-ipucu{margin:10px auto 0;max-width:86%;text-align:center;background:rgba(11,18,32,.72);padding:9px 14px;border-radius:14px;font-size:14px;line-height:1.35}
+#xr-ui .xr-alt{display:flex;flex-direction:column;gap:7px;padding:0 0 18px}
+#xr-ui .xr-satir{display:flex;gap:8px;justify-content:center}
+#xr-ui .yuvarlak{border:1px solid rgba(232,196,106,.4);background:rgba(11,18,32,.8);color:var(--yazi);font:600 13px "Segoe UI",Roboto,Arial,sans-serif;padding:10px 16px;border-radius:24px}
 #yok{display:none;margin:10px 16px 0;background:#2a1b14;border-left:3px solid var(--altin);padding:10px 12px;font-size:13px;border-radius:6px}
 footer{text-align:center;color:#5b647a;font-size:11px;padding:10px 16px 22px;line-height:1.5}
 </style></head><body>
@@ -74,11 +82,27 @@ footer{text-align:center;color:#5b647a;font-size:11px;padding:10px 16px 22px;lin
     <div class="serit" id="urunler"></div>
     <div class="serit" id="stiller"></div>
   </div>
-  <button slot="ar-button" class="ar-dugme">
+  <button slot="ar-button" style="display:none"></button>
+  <button class="ar-dugme" id="ar-baslat">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M12 7l5 3v4l-5 3-5-3v-4z"/></svg>
     Kamerada gör (AR)
   </button>
 </model-viewer>
+<div id="xr-ui">
+  <div>
+    <div class="xr-ust">
+      <button class="anahtar acik xr-kontrol" data-x="isik"><i></i><span>Işık açık</span></button>
+      <div class="oncesonra xr-kontrol"><button data-os="once">Önce</button><button data-os="sonra" class="aktif">Sonra</button></div>
+      <button class="yuvarlak xr-kontrol" data-x="kapat">✕</button>
+    </div>
+    <div id="xr-ipucu">Telefonu yere doğrult…</div>
+  </div>
+  <div class="xr-alt">
+    <div class="serit xr-kontrol" id="xr-urunler"></div>
+    <div class="serit xr-kontrol" id="xr-stiller"></div>
+    <div class="xr-satir xr-kontrol"><button class="yuvarlak" data-x="don-sol">↺ 2°</button><button class="yuvarlak" data-x="yeniden">Yeniden yerleştir</button><button class="yuvarlak" data-x="don-sag">2° ↻</button></div>
+  </div>
+</div>
 <div id="chrome" style="display:none;margin:10px 16px 0;background:#13233f;border-left:3px solid var(--altin);padding:12px;font-size:13.5px;border-radius:6px;line-height:1.45">
   Uygulama içi tarayıcıdasın; kamera (AR) burada çalışmaz.<br>
   <a id="chrome-ac" style="display:inline-block;margin-top:8px;background:var(--altin);color:#0b1220;font-weight:700;padding:10px 16px;border-radius:24px;text-decoration:none">Chrome'da aç</a>
@@ -136,7 +160,7 @@ const SURUM = 'v2';   // dosyalar değişince artır: telefon önbelleği eski m
 function dosya() { return (D.once ? 'glb/tam_mevcut.glb' : `glb/${D.mod}_${D.urun}.glb`) + '?' + SURUM; }
 function yukle() {
   const y = document.getElementById('yuk'); if (y) { y.style.display = 'block'; y.textContent = 'Model yükleniyor…'; }
-  mv.src = dosya(); bilgi();
+  mv.src = dosya(); bilgi(); window.dispatchEvent(new CustomEvent('ar-degisti', {detail: 'model'}));
 }
 function bilgi() {
   const u = D.once ? ESKI : URUN[D.urun];
@@ -146,6 +170,7 @@ function bilgi() {
   document.querySelectorAll('#g-mod button').forEach(b => b.disabled = D.once && b.dataset.v === 'isik');
 }
 function uygula() {
+  window.dispatchEvent(new CustomEvent('ar-degisti', {detail: 'gorunum'}));
   if (!mv.model) return;
   for (const m of mv.model.materials) {
     const n = adi(m), o = ORJ[m.name]; if (!o) continue; const p = m.pbrMetallicRoughness;
@@ -210,5 +235,24 @@ function oncesonra(once) {
 }
 document.getElementById('oncesonra').addEventListener('click', e => { const b = e.target.closest('button'); if (b) oncesonra(b.dataset.v === 'once'); });
 bilgi();
+
+// ---- AR başlat: önce kendi WebXR'ımız (köşeye 1:1, net); olmazsa Google AR (Scene Viewer) ----
+window.AR = {D, STIL, dosya, adi, ISIKLI, ALTIN};
+for (const [k, u] of Object.entries(URUN)) document.getElementById('xr-urunler').insertAdjacentHTML('beforeend', `<button class="cip${k === D.urun ? ' aktif' : ''}" data-urun="${k}">${u.ad}</button>`);
+for (const [k, s] of Object.entries(STIL)) document.getElementById('xr-stiller').insertAdjacentHTML('beforeend', `<button class="cip${k === D.stil ? ' aktif' : ''}" data-stil="${k}"><s style="background:${s.ornek}"></s>${s.ad}</button>`);
+let XR = null, XRhata = 'hazırlanıyor';                    // modül önceden yüklenir: dokunuş izni (user activation) beklerken düşmesin
+(async () => { try {
+  if (!navigator.xr) throw new Error('navigator.xr yok');
+  if (!(await navigator.xr.isSessionSupported('immersive-ar'))) throw new Error('immersive-ar desteklenmiyor');
+  XR = await import('./xr.js?v4'); XRhata = '';
+} catch (h) { XRhata = h && h.message ? h.message : String(h); } })();
+document.getElementById('ar-baslat').onclick = async () => {
+  let neden = XRhata || '';
+  if (XR) { try { await XR.baslat(); return; } catch (h) { neden = h && h.message ? h.message : String(h); console.warn('WebXR', neden); } }
+  document.getElementById('teshis').textContent = 'Kendi AR açılamadı: ' + neden;
+  if (mv.canActivateAR) { mv.arModes = 'scene-viewer quick-look'; mv.activateAR(); document.getElementById('yok').style.display = 'block';
+    document.getElementById('yok').firstChild.textContent = 'Google AR ile açıldı (yedek). '; }
+  else yokGoster();
+};
 </script>
 </body></html>
