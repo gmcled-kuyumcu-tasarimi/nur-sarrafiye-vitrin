@@ -79,7 +79,11 @@ footer{text-align:center;color:#5b647a;font-size:11px;padding:10px 16px 22px;lin
     Kamerada gör (AR)
   </button>
 </model-viewer>
-<div id="yok">Bu telefonda AR açılamadı. Modeli yukarıda parmağınla çevirip yakınlaştırabilirsin. AR için güncel Chrome ve “Google Play Services for AR” gerekir.</div>
+<div id="chrome" style="display:none;margin:10px 16px 0;background:#13233f;border-left:3px solid var(--altin);padding:12px;font-size:13.5px;border-radius:6px;line-height:1.45">
+  Uygulama içi tarayıcıdasın; kamera (AR) burada çalışmaz.<br>
+  <a id="chrome-ac" style="display:inline-block;margin-top:8px;background:var(--altin);color:#0b1220;font-weight:700;padding:10px 16px;border-radius:24px;text-decoration:none">Chrome'da aç</a>
+  <div style="margin-top:6px;color:var(--soluk);font-size:12px">Olmazsa: sağ üstteki ⋮ menüden “Tarayıcıda aç / Chrome'da aç”.</div></div>
+<div id="yok">Bu telefonda AR açılamadı. Modeli yukarıda parmağınla çevirip yakınlaştırabilirsin. AR için güncel Chrome ve “Google Play Services for AR” gerekir.<div id="teshis" style="margin-top:6px;color:var(--soluk);font-size:11px;word-break:break-all"></div></div>
 
 <div class="bilgi"><div><b id="b-adet">18</b><small>adet</small></div><div><b id="b-w">900 W</b><small>kurulu güç</small></div><div><b id="b-lm">140.184</b><small>lümen</small></div></div>
 <p id="urun-not"></p>
@@ -163,11 +167,30 @@ mv.addEventListener('load', () => {
     ORJ[m.name] = {renk: [...p.baseColorFactor], metal: p.metallicFactor, puruz: p.roughnessFactor, isima: [...m.emissiveFactor]};
   }
   uygula();
-  if (!mv.canActivateAR) document.getElementById('yok').style.display = 'block';
+  if (!mv.canActivateAR && !ICTARAYICI) yokGoster();
 });
 mv.addEventListener('progress', e => { const y = document.getElementById('yuk'); if (!y) return;
   y.textContent = 'Model yükleniyor… %' + Math.round(e.detail.totalProgress * 100); if (e.detail.totalProgress >= 1) y.style.display = 'none'; });
-mv.addEventListener('ar-status', e => { if (e.detail.status === 'failed') document.getElementById('yok').style.display = 'block'; });
+let yedekte = false;
+mv.addEventListener('ar-status', e => {
+  if (e.detail.status !== 'failed') return;
+  if (!yedekte && mv.arModes.includes('webxr')) {            // kamera modu (WebXR) açılmadı → Google'ın AR görüntüleyicisine geç
+    yedekte = true; mv.arModes = 'scene-viewer quick-look';
+    mv.querySelector('.ar-dugme').lastChild.textContent = ' Tekrar bas (Google AR)'; return;
+  }
+  yokGoster();
+});
+const UA = navigator.userAgent, ANDROID = /Android/i.test(UA);
+const ICTARAYICI = ANDROID && (/; wv\)|Telegram|Instagram|FBAN|FBAV|GSA\//i.test(UA));
+if (ICTARAYICI) {
+  document.getElementById('chrome').style.display = 'block';
+  document.getElementById('chrome-ac').href = 'intent://' + location.host + location.pathname + location.search + '#Intent;scheme=https;package=com.android.chrome;end';
+}
+async function yokGoster() {
+  let xr = 'yok'; try { xr = navigator.xr ? String(await navigator.xr.isSessionSupported('immersive-ar')) : 'yok'; } catch (_) { xr = 'hata'; }
+  document.getElementById('teshis').textContent = `Teşhis: AR=${mv.canActivateAR} · WebXR=${xr} · içTarayıcı=${ICTARAYICI} · ${UA.slice(0, 140)}`;
+  document.getElementById('yok').style.display = 'block';
+}
 
 // kontroller
 const urunler = document.getElementById('urunler'), stiller = document.getElementById('stiller');
