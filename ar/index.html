@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="tr"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Vitrini Yerinde Gör · GMC LED</title>
+<meta name="theme-color" content="#0b1220">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+<style>
+:root{--zemin:#0b1220;--altin:#e8c46a;--yazi:#f4efe2;--soluk:#9aa3b5}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--zemin);color:var(--yazi);font-family:"Segoe UI",Roboto,Arial,sans-serif}
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 6px}
+header img{height:26px}
+header span{font-size:12px;color:var(--soluk);letter-spacing:.5px}
+h1{font-size:20px;margin:6px 16px 2px;font-weight:600}
+h1 b{color:var(--altin);font-weight:600}
+p.alt{margin:0 16px 10px;color:var(--soluk);font-size:13.5px;line-height:1.45}
+model-viewer{width:100%;height:62vh;min-height:360px;background:radial-gradient(ellipse at 50% 40%,#1c2a48 0%,#0b1220 70%);--poster-color:transparent}
+.ar-dugme{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);background:var(--altin);color:#0b1220;border:0;border-radius:40px;
+  padding:15px 26px;font-size:16px;font-weight:700;box-shadow:0 6px 24px rgba(232,196,106,.45);display:flex;align-items:center;gap:10px;white-space:nowrap}
+.ar-dugme svg{width:22px;height:22px}
+.yuk{position:absolute;inset:auto 0 50% 0;text-align:center;color:var(--soluk);font-size:13px}
+.adimlar{margin:14px 16px 8px;padding:0;list-style:none;counter-reset:a}
+.adimlar li{counter-increment:a;display:flex;gap:12px;align-items:flex-start;margin:0 0 11px;font-size:14px;line-height:1.4}
+.adimlar li::before{content:counter(a);flex:0 0 26px;height:26px;border-radius:50%;background:#18233b;color:var(--altin);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+.bilgi{margin:6px 16px 22px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.bilgi div{background:#121c30;border-radius:10px;padding:10px 6px;text-align:center}
+.bilgi b{display:block;color:var(--altin);font-size:17px}
+.bilgi small{color:var(--soluk);font-size:11px}
+#yok{display:none;margin:0 16px 14px;background:#2a1b14;border-left:3px solid var(--altin);padding:10px 12px;font-size:13px;border-radius:6px}
+footer{text-align:center;color:#5b647a;font-size:11px;padding:6px 0 20px}
+</style></head><body>
+<header><img src="../img/gmc_logo_beyaz.png" alt="GMC LED"><span>NUR SARRAFİYE · REV. B</span></header>
+<h1>Vitrini <b>dükkânında gör</b></h1>
+<p class="alt">Kamerayı aç; 18 × ETNA 26'lı yeni vitrin gerçek ölçüsünde (248 × 73 cm) önünde belirsin. Etrafında yürü, yaklaş, içine bak.</p>
+
+<model-viewer id="mv" src="nur_vitrin.glb" alt="Nur Sarrafiye vitrini, 18 ETNA 26" ar ar-modes="scene-viewer webxr quick-look"
+  ar-scale="fixed" ar-placement="floor" camera-controls touch-action="pan-y" shadow-intensity="1" shadow-softness=".8"
+  exposure="1.15" environment-image="neutral" camera-orbit="-15deg 82deg auto" field-of-view="auto" interaction-prompt="auto">
+  <div class="yuk" slot="progress-bar" id="yuk">Model yükleniyor…</div>
+  <button slot="ar-button" class="ar-dugme">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M12 7l5 3v4l-5 3-5-3v-4z"/></svg>
+    Kamerada gör (AR)
+  </button>
+</model-viewer>
+<div id="yok">Bu telefonda AR açılamadı. Modeli yukarıda parmağınla çevirip yakınlaştırabilirsin. AR için güncel Chrome ve “Google Play Services for AR” gerekir.</div>
+
+<ul class="adimlar">
+  <li>“Kamerada gör”e bas, kamera iznini ver.</li>
+  <li>Telefonu yere doğrult ve yavaşça sağa sola gezdir; zemin tanınınca vitrin yere oturur.</li>
+  <li>Vitrin 1:1 ölçüdedir, büyüyüp küçülmez. Parmakla kaydırıp döndürerek dükkânın önüne hizala.</li>
+  <li>Yürüyerek yaklaş: tavandaki ETNA'ları, bilezikleri, yüzük tepsilerini yakından gör.</li>
+</ul>
+<div class="bilgi">
+  <div><b>18</b><small>ETNA 26</small></div>
+  <div><b>900 W</b><small>kurulu güç</small></div>
+  <div><b>248×73</b><small>vitrin, cm</small></div>
+</div>
+<footer>GMC LED · Kuyumcu Aydınlatma · AR önizleme ölçü ve yerleşimi gösterir; ışık etkisi için sunumdaki renderlara bakınız.</footer>
+<script>
+const mv=document.getElementById('mv');
+mv.addEventListener('progress',e=>{const y=document.getElementById('yuk');if(y)y.textContent='Model yükleniyor… %'+Math.round(e.detail.totalProgress*100);if(e.detail.totalProgress>=1&&y)y.style.display='none';});
+mv.addEventListener('load',()=>{if(!mv.canActivateAR)document.getElementById('yok').style.display='block';});
+mv.addEventListener('ar-status',e=>{if(e.detail.status==='failed')document.getElementById('yok').style.display='block';});
+</script>
+</body></html>
