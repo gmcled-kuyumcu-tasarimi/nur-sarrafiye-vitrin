@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="color-scheme" content="dark">
+<title>GMC LED · Nur Sarrafiye Vitrin Aydınlatma</title><meta name="robots" content="noindex">
+<style>
+@font-face{font-family:Montserrat;src:url(lib/Montserrat-Regular.ttf);font-weight:400}@font-face{font-family:Montserrat;src:url(lib/Montserrat-SemiBold.ttf);font-weight:600}@font-face{font-family:Montserrat;src:url(lib/Montserrat-Bold.ttf);font-weight:700}
+:root{--bg:#0B0B0D;--text:#F7F5F0;--muted:#B5B0A6;--faint:#7C786F;--line:rgba(255,255,255,.1);--amber:#FCB332;--panel:rgba(20,19,17,.62);--ease:cubic-bezier(.16,1,.3,1)}
+*{margin:0;padding:0;box-sizing:border-box}html,body{height:100%}
+body{background:var(--bg);color:var(--text);overflow:hidden;font-family:Montserrat,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.deck{position:fixed;inset:0}
+.slide{position:absolute;inset:0;display:flex;align-items:center;padding:90px 7vw 110px;opacity:0;pointer-events:none;transition:opacity .9s var(--ease);overflow:hidden}
+.slide.active{opacity:1;pointer-events:auto}.slide.center{justify-content:center;text-align:center}
+.inner{position:relative;z-index:3;width:100%;max-width:1380px;margin:0 auto}
+.bg{position:absolute;inset:0;z-index:0;overflow:hidden}.bg img{width:100%;height:100%;object-fit:cover;transform:scale(1.12);transition:transform 12s linear,opacity 1.4s var(--ease)}
+.slide.active .bg img{transform:scale(1.0)}.bg img.ust{position:absolute;inset:0;opacity:0}.bg img.ust.in{opacity:1}
+.shade{position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(11,11,13,.96) 0%,rgba(11,11,13,.8) 38%,rgba(11,11,13,.28) 75%,rgba(11,11,13,.5) 100%)}
+.shade.full{background:radial-gradient(ellipse at center,rgba(11,11,13,.45) 0%,rgba(11,11,13,.92) 72%)}.shade.bottom{background:linear-gradient(0deg,rgba(11,11,13,.97) 10%,rgba(11,11,13,.5) 55%,rgba(11,11,13,.7) 100%)}.shade.soft{background:linear-gradient(0deg,rgba(11,11,13,.85) 0%,rgba(11,11,13,.25) 45%,rgba(11,11,13,.15) 100%)}
+.grain{position:fixed;inset:0;z-index:40;pointer-events:none;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E")}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:22px 4vw}
+.topbar img{height:34px}.topbar .rev{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.kicker{display:inline-flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:18px}
+.kicker:before{content:"";width:28px;height:2px;background:var(--amber)}
+h1{font-size:clamp(38px,6vw,86px);line-height:1.02;font-weight:700;letter-spacing:-.02em;max-width:12ch}h1 em{font-style:normal;color:var(--amber)}
+h2{font-size:clamp(30px,4.2vw,58px);line-height:1.06;font-weight:700;letter-spacing:-.02em;max-width:16ch;margin-bottom:22px}h2 em{font-style:normal;color:var(--amber)}
+.lead{font-size:clamp(16px,1.35vw,21px);color:var(--muted);max-width:56ch;line-height:1.55}
+.stats{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px}.stat{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:14px;padding:16px 20px;min-width:150px;backdrop-filter:blur(8px)}
+.stat b{display:block;font-size:clamp(26px,2.6vw,40px);font-weight:700;letter-spacing:-.02em}.stat span{font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.list{list-style:none;margin-top:22px;display:grid;gap:12px;max-width:620px}.list li{display:flex;gap:14px;align-items:flex-start;font-size:clamp(15px,1.2vw,18px);line-height:1.5;color:var(--text)}
+.list li:before{content:"";flex:none;width:9px;height:9px;border-radius:50%;background:var(--amber);margin-top:9px;box-shadow:0 0 14px var(--amber)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:42px;align-items:center}.media{border-radius:18px;overflow:hidden;border:1px solid var(--line);background:#000;box-shadow:0 30px 80px rgba(0,0,0,.6)}.media img{width:100%;display:block;max-height:62vh;object-fit:cover}
+.plan{position:relative;background:#fff}.plan .wipe{position:absolute;inset:0;background:var(--bg);transform-origin:left;transition:transform 2.2s var(--ease)}.plan.in .wipe{transform:scaleX(0)}
+.cmp{position:relative}.cmp img{width:100%;display:block}.cmp .on{position:absolute;inset:0;opacity:0;transition:opacity 1.6s var(--ease)}.cmp.in .on{opacity:1}
+.tag{position:absolute;left:18px;bottom:18px;background:rgba(0,0,0,.6);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;backdrop-filter:blur(6px)}
+.big{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.6);max-width:1100px;margin:0 auto}.big img{width:100%;display:block;max-height:60vh;object-fit:cover}.big .on{height:100%}
+.big .on{position:absolute;inset:0;opacity:0;transition:opacity 2s var(--ease)}.big.in .on{opacity:1}.big .etk{position:absolute;top:18px;left:18px;background:rgba(0,0,0,.6);border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;backdrop-filter:blur(6px);transition:opacity .6s}.big .etk.sonra{opacity:0;background:var(--amber);color:#111;border-color:var(--amber);font-weight:600}.big.in .etk.once{opacity:0}.big.in .etk.sonra{opacity:1}
+.btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:14px;text-decoration:none;font-weight:600;font-size:15px;border:1px solid var(--line);color:var(--text);background:rgba(255,255,255,.04);transition:transform .3s var(--ease),background .3s}.btn:hover{transform:translateY(-2px);background:rgba(255,255,255,.08)}.btn.amber{background:var(--amber);color:#111;border-color:var(--amber)}
+[data-r]{opacity:0;transform:translateY(26px);transition:opacity .9s var(--ease),transform .9s var(--ease)}[data-r].in{opacity:1;transform:none}
+.ui{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:18px 4vw;gap:16px}
+#progress{display:flex;gap:6px;flex:1}.seg{flex:1;height:3px;background:rgba(255,255,255,.12);border-radius:2px;cursor:pointer;overflow:hidden}.seg i{display:block;height:100%;width:0;background:var(--amber);transition:width .6s var(--ease)}.seg.done i,.seg.cur i{width:100%}
+.nav{display:flex;gap:12px;align-items:center}.nav button{width:64px;height:64px;border-radius:50%;border:2px solid var(--amber);background:var(--amber);color:#111;cursor:pointer;font-size:34px;font-weight:700;line-height:1;box-shadow:0 8px 24px rgba(252,179,50,.35)}.nav button:hover{transform:scale(1.06)}.nav button:disabled{opacity:.3;cursor:default}#counter{font-size:12px;color:var(--muted);letter-spacing:.14em;min-width:52px;text-align:center}
+.yan{position:fixed;top:50%;transform:translateY(-50%);z-index:50;width:56px;height:96px;border:none;background:rgba(0,0,0,.45);color:var(--amber);font-size:56px;line-height:1;cursor:pointer;backdrop-filter:blur(4px)}.yan.sol{left:0;border-radius:0 16px 16px 0}.yan.sag{right:0;border-radius:16px 0 0 16px}.yan:hover{background:rgba(252,179,50,.25)}
+.hint{position:fixed;bottom:74px;left:50%;transform:translateX(-50%);z-index:50;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);animation:hint 2.2s infinite}@keyframes hint{0%,100%{opacity:.4}50%{opacity:1}}
+.glow{position:absolute;width:60vw;height:60vw;border-radius:50%;background:radial-gradient(circle,rgba(252,179,50,.22),transparent 60%);filter:blur(30px);z-index:1;pointer-events:none}
+.logo-big{height:clamp(44px,7vw,96px);margin-bottom:34px;filter:drop-shadow(0 0 30px rgba(252,179,50,.35))}
+@media (max-width:820px){.yan{width:44px;height:80px;font-size:44px}.slide{padding:80px 6vw 110px;align-items:flex-start;overflow:auto}.two{grid-template-columns:1fr;gap:20px}h1{max-width:none}.topbar img{height:26px}.shade{background:linear-gradient(0deg,rgba(11,11,13,.97) 0%,rgba(11,11,13,.78) 60%,rgba(11,11,13,.5) 100%)}}
+</style></head><body>
+<div class="grain"></div>
+<div class="topbar"><img src="img/gmc_logo_beyaz.png" alt="GMC LED"><span class="rev">Nur Sarrafiye · Vitrin · Rev. A</span></div>
+<div class="deck" id="deck">
+
+<section class="slide center">
+  <div class="bg"><img src="img/on_sonra.jpg" alt=""></div><div class="shade full"></div><div class="glow" style="left:20vw;top:10vh"></div>
+  <div class="inner"><img class="logo-big" src="img/gmc_logo_beyaz.png" alt="GMC LED" data-r>
+    <div class="kicker" data-r data-step="0" style="justify-content:center">Vitrin aydınlatma projesi</div>
+    <h1 data-r data-step="0" style="margin:0 auto">Nur Sarrafiye<br><em>vitrini</em> ışıkla yeniden.</h1>
+    <p class="lead" data-r data-step="1" style="margin:22px auto 0">Mevcut vitrin birebir modellendi; yalnız tavan aydınlatması değişti. 10 × ETNA 26, iki renkli göz dizilimi, gizli alt vitrin şeridi.</p></div>
+</section>
+
+<section class="slide">
+  <div class="bg"><img src="img/on_once.jpg" alt=""></div><div class="shade soft"></div>
+  <div class="inner"><div class="kicker" data-r>Önce · sonra</div><h2 data-r>Aynı vitrin, aynı dizilim. <em>Işık</em> değişti.</h2>
+    <div class="big" id="buyukcmp" data-r data-step="0"><img src="img/on_once.jpg" alt=""><img class="on" src="img/on_sonra.jpg" alt=""><span class="etk once">Önce · mevcut aydınlatma</span><span class="etk sonra">Sonra · 10 × ETNA 26</span></div></div>
+</section>
+
+<section class="slide">
+  <div class="bg"><img src="img/perspektif_sonra.jpg" alt=""></div><div class="shade"></div>
+  <div class="inner two"><div><div class="kicker" data-r>Sokaktan</div><h2 data-r>Altın <em>sahneye</em> çıkar.</h2>
+    <ul class="list"><li data-r data-step="0">10 × ETNA 26, 5 × 2 düzen; bilezik direkleri, büstler ve tepsiler aynı yerinde.</li><li data-r data-step="0">Sıcak + beyaz göz karışımı: altın parlar, beyaz altın ve taş doğal rengini korur.</li><li data-r data-step="1">Alt vitrine armatür yok; tabla altı gizli şerit yüzük tepsilerini aydınlatır.</li></ul>
+    <div class="stats"><div class="stat" data-r data-step="1"><b data-count="10">0</b><span>ETNA 26</span></div><div class="stat" data-r data-step="1"><b data-count="77880" data-suffix=" lm">0</b><span>toplam ışık akısı</span></div><div class="stat" data-r data-step="1"><b>500 W</b><span>kurulu güç</span></div></div></div>
+    <div class="cmp media" id="perscmp" data-r data-step="0"><img src="img/perspektif_once.jpg" alt=""><img class="on" src="img/perspektif_sonra.jpg" alt=""><span class="tag">önce → sonra</span></div></div>
+</section>
+
+<section class="slide">
+  <div class="bg"><img src="img/tavan_sonra.jpg" alt=""></div><div class="shade"></div>
+  <div class="inner two"><div><div class="kicker" data-r>Ürün · ETNA 26</div><h2 data-r>Kendi kalıbımız, <em>26 mercek</em>, iki renk.</h2>
+    <p class="lead" data-r data-step="0">340 × 180 mm beyaz çerçeve, 320 × 155 kesim, 50 W, 7.788 lm, 38° optik. Her armatürde 8 sıcak (3000 K) + 18 beyaz (6000 K) göz.</p>
+    <div class="stats"><div class="stat" data-r data-step="1"><b data-count="26">0</b><span>mercek / armatür</span></div><div class="stat" data-r data-step="1"><b data-count="7788" data-suffix=" lm">0</b><span>ışık akısı</span></div><div class="stat" data-r data-step="1"><b>5 yıl</b><span>garanti</span></div></div></div>
+    <div class="cmp media" id="etnacmp" data-r data-step="0"><img src="img/etna_26_kapali.jpg" alt=""><img class="on" src="img/etna_26_acik.jpg" alt=""><span class="tag">kapalı → açık</span></div></div>
+</section>
+
+<section class="slide">
+  <div class="bg"><img src="img/yakin_sonra.jpg" alt=""></div><div class="shade"></div>
+  <div class="inner two"><div><div class="kicker" data-r>Yerleşim</div><h2 data-r><em>5 × 2</em>, aks 470 × 303 mm.</h2>
+    <ul class="list"><li data-r data-step="0">Aralıklar 130 / 123 mm; ön camdan arka panele eşit dağılım.</li><li data-r data-step="0">Askı direkleri iki ETNA sırasının arasından tavana bağlanır; çakışma yok.</li><li data-r data-step="1">Mevcut yuvarlak paneller sökülür, tavan düz krem lake; sürücüler tavan boşluğunda.</li></ul></div>
+    <div class="media plan" id="plan" data-r data-step="0"><img src="img/03_ETNA26_yerlesim_plani.png" alt=""><div class="wipe"></div></div></div>
+</section>
+
+<section class="slide">
+  <div class="bg"><img src="img/yakin_sonra.jpg" alt=""></div><div class="shade bottom"></div>
+  <div class="inner"><div class="kicker" data-r>Detay</div><h2 data-r>Büstler, bilezikler, tepsiler: <em>hepsi</em> ışığın altında.</h2>
+    <p class="lead" data-r data-step="0">Her ürün sırası en az iki armatürden ışık alır; direk gölgesi yok. Alt vitrinde şerit ışığı yalnız yüzük tepsilerinde görünür, kaynağı görünmez.</p></div>
+</section>
+
+<section class="slide center">
+  <div class="bg"><img src="img/on_sonra.jpg" alt=""></div><div class="shade full"></div>
+  <div class="inner"><div class="kicker" data-r style="justify-content:center">Teslim</div><h2 data-r style="margin:0 auto 14px">Proje <em>hazır</em>. Uygulamaya geçelim.</h2>
+    <p class="lead" data-r data-step="0" style="margin:0 auto">Sunum PDF, ETNA 26 yerleşim planı ve malzeme listesi tek bağlantıda. Ürünler GMC LED üretimi, 5 yıl garanti.</p>
+    <div class="btns" data-r data-step="1" style="justify-content:center"><a class="btn amber" href="00_Sunum_Nur_Sarrafiye_Vitrin_GMC_LED.pdf" target="_blank">Sunum PDF</a><a class="btn" href="img/03_ETNA26_yerlesim_plani.png" target="_blank">Yerleşim planı</a><a class="btn" href="04_Malzeme_listesi.xlsx">Malzeme listesi</a><a class="btn" href="img/02_Once_Sonra_karsilastirma.jpg" target="_blank">Önce / sonra görseli</a></div>
+    <p data-r data-step="1" style="margin-top:26px;color:var(--faint);font-size:13px;letter-spacing:.1em">GMC LED · Quality Light Solutions · gmcled-kuyumcu-tasarimi.github.io/nur-sarrafiye-vitrin</p></div>
+</section>
+
+</div>
+<div class="hint" id="hint">kaydır · ok tuşları · dokun</div>
+<div class="ui"><div class="nav"><button id="prev" aria-label="Önceki">‹</button><span id="counter">1 / 7</span><button id="next" aria-label="Sonraki">›</button></div><div id="progress"></div></div>
+<button class="yan sol" id="prev2" aria-label="Önceki">‹</button><button class="yan sag" id="next2" aria-label="Sonraki">›</button>
+<script>
+const deck=document.getElementById('deck');const slides=Array.from(deck.querySelectorAll('.slide'));const progress=document.getElementById('progress');const counter=document.getElementById('counter');const prevBtn=document.getElementById('prev');const nextBtn=document.getElementById('next');const N=slides.length;
+let cur=0,beat=0,maxBeat=0,timers=[];const clearT=()=>{timers.forEach(clearTimeout);timers=[];};
+slides.forEach((_,i)=>{const s=document.createElement('div');s.className='seg';s.innerHTML='<i></i>';s.addEventListener('click',()=>show(i));progress.appendChild(s);});const segs=Array.from(progress.children);
+const easeOutCubic=t=>1-Math.pow(1-t,3);
+function countUp(el){if(el.dataset.done==='1')return;el.dataset.done='1';const target=+el.dataset.count,prefix=el.dataset.prefix||'',suffix=el.dataset.suffix||'',dur=1500,start=performance.now();(function frame(now){const t=Math.min(1,(now-start)/dur);el.textContent=prefix+Math.round(easeOutCubic(t)*target).toLocaleString('tr-TR')+suffix;if(t<1)requestAnimationFrame(frame);})(start);}
+function applyReveal(el){el.classList.add('in');if(el.hasAttribute('data-count'))countUp(el);el.querySelectorAll('[data-count]').forEach(countUp);}
+function beatItems(slide,b){return Array.from(slide.querySelectorAll('[data-r]')).filter(e=>(+(e.dataset.step||0))===b);}
+function revealBeat(b,instant){beatItems(slides[cur],b).forEach((el,k)=>{if(instant)applyReveal(el);else timers.push(setTimeout(()=>applyReveal(el),120+k*140));});onBeat(cur,b);}
+function resetSlide(s){s.querySelectorAll('[data-r]').forEach(e=>e.classList.remove('in'));s.querySelectorAll('[data-count]').forEach(e=>{e.dataset.done='0';e.textContent=(e.dataset.prefix||'')+'0'+(e.dataset.suffix||'');});s.querySelectorAll('.cmp,.big,.plan').forEach(c=>c.classList.remove('in'));}
+function calcMax(s){let m=0;s.querySelectorAll('[data-step]').forEach(e=>m=Math.max(m,+e.dataset.step));return m;}
+function show(i,openAll){i=Math.max(0,Math.min(N-1,i));clearT();const old=slides[cur];old.classList.remove('active');resetSlide(old);cur=i;beat=0;const s=slides[cur];s.classList.add('active');s.scrollTop=0;maxBeat=calcMax(s);if(openAll){for(let b=0;b<=maxBeat;b++)revealBeat(b,true);beat=maxBeat;}else revealBeat(0,false);updateChrome();document.getElementById('hint').style.display=cur===0?'':'none';}
+function updateChrome(){segs.forEach((sg,k)=>{sg.classList.toggle('done',k<cur);sg.classList.toggle('cur',k===cur);});counter.textContent=(cur+1)+' / '+N;prevBtn.disabled=cur===0&&beat===0;nextBtn.disabled=cur===N-1&&beat===maxBeat;}
+function next(){if(beat<maxBeat){beat++;revealBeat(beat,false);updateChrome();}else if(cur<N-1)show(cur+1);}
+function prev(){if(cur>0)show(cur-1,true);}
+function onBeat(i,b){const s=slides[i];if(b!==0)return;s.querySelectorAll('.cmp,.big').forEach(c=>timers.push(setTimeout(()=>c.classList.add('in'),c.classList.contains('big')?1800:1400)));const p=s.querySelector('.plan');if(p)timers.push(setTimeout(()=>p.classList.add('in'),500));}
+nextBtn.addEventListener('click',next);prevBtn.addEventListener('click',prev);document.getElementById('next2').addEventListener('click',next);document.getElementById('prev2').addEventListener('click',prev);
+window.addEventListener('keydown',e=>{if(e.code==='Space'||e.code==='ArrowRight'||e.code==='ArrowDown'||e.code==='PageDown'){e.preventDefault();next();}else if(e.code==='ArrowLeft'||e.code==='ArrowUp'||e.code==='PageUp'){e.preventDefault();prev();}});
+let wheelLock=false;window.addEventListener('wheel',e=>{const s=slides[cur];if(s.scrollHeight>s.clientHeight+4){const atEnd=s.scrollTop+s.clientHeight>=s.scrollHeight-2,atTop=s.scrollTop<=0;if((e.deltaY>0&&!atEnd)||(e.deltaY<0&&!atTop))return;}e.preventDefault();if(wheelLock||Math.abs(e.deltaY)<12)return;wheelLock=true;setTimeout(()=>wheelLock=false,850);e.deltaY>0?next():prev();},{passive:false});
+let tx=0,ty=0;window.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+window.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.3){dx<0?next():prev();}else if(Math.abs(dy)>70&&Math.abs(dy)>Math.abs(dx)*1.3){const s=slides[cur];if(s.scrollHeight<=s.clientHeight+4){dy<0?next():prev();}}});
+slides[0].classList.add('active');maxBeat=calcMax(slides[0]);revealBeat(0,false);updateChrome();
+</script></body></html>
